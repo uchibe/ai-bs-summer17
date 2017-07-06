@@ -71,7 +71,7 @@ ENV BASH_ENV ~/.bashrc
 #--------------------
 # Install Deep Learning
 #--------------------
-pip install h5py
+RUN pip install h5py
 RUN apt-get update && apt-get install --no-install-recommends -y \
     gfortran \
     python-skimage
