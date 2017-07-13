@@ -1,80 +1,31 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
-#--------------------
-# General setup
-#--------------------
+# ========== Anaconda ==========
+# https://github.com/ContinuumIO/docker-images/blob/master/anaconda/Dockerfile
+RUN apt-get update --fix-missing && apt-get install -y wget bzip2 ca-certificates \
+    libglib2.0-0 libxext6 libsm6 libxrender1 \
+    git mercurial subversion 
 
-# Get the dependencies
-RUN apt-get update \
-    && apt-get install -y xorg-dev \
-    libgl1-mesa-dev \
-    xvfb \
-    libxinerama1 \
-    libxcursor1 \
-    unzip \
-    libglu1-mesa \
-    libav-tools \
-    python-numpy \
-    python-dev \
-    python-scipy \
-    python-matplotlib \
-    python-opengl \
-    python-pyglet \
-    python-setuptools \
-    libboost-all-dev \
-    zlib1g-dev \
-    libsdl2-dev \
-    libpq-dev \
-    libjpeg-dev \
-    cmake \
-    curl \
-    git \
-    swig \
-    wget \
-    xpra \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/* \
- && easy_install pip
+RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
+    wget  --no-check-certificate --quiet https://repo.continuum.io/archive/Anaconda3-4.4.0-Linux-x86_64.sh -O ~/anaconda.sh && \
+    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
+    rm ~/anaconda.sh
 
-#--------------------
-# Install gym
-#--------------------
-RUN pip install --upgrade pip
-RUN pip install 'gym[all]'
+RUN apt-get install -y unzip curl grep sed dpkg && apt-get clean
+RUN apt-get -y install git make cmake unzip zlib1g-dev libjpeg-dev xvfb \
+    libav-tools xorg-dev libboost-all-dev libsdl2-dev swig
+# ALE requires zlib
+# MUJOCO requires graphics stuff (Why?)
+RUN apt-get -y build-dep glfw
+RUN apt-get -y install libxrandr2 libxinerama-dev libxi6 libxcursor-dev
 
+ENV PATH /opt/conda/bin:$PATH
 
-#--------------------
-# Install ROS
-#--------------------
-# setup sources.list
-RUN echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list
-
-# setup keys
-RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 421C365BD9FF1F717815A3895523BAEEB01FA116
-
-# install bootstrap tools
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    python-rosdep \
-    python-rosinstall \
-    python-vcstools \
-    ros-indigo-desktop-full \
-    && rm -rf /var/lib/apt/lists/*
-
-# bootstrap rosdep
-RUN rosdep init \
-    && rosdep update
-
-#
-RUN echo 'source /opt/ros/indigo/setup.bash' >> ~/.bashrc
-ENV BASH_ENV ~/.bashrc
-
-#--------------------
-# Install Deep Learning
-#--------------------
-pip install h5py
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    gfortran \
-    python-skimage
-
+# ========== Add codebase stub ==========
 CMD mkdir /root/code
+ADD environment.yml /root/code/environment.yml
+RUN conda env create -f /root/code/environment.yml
+
+RUN echo "source activate aibs" >> /root/.bashrc
+ENV BASH_ENV /root/.bashrc
 WORKDIR /root/code
