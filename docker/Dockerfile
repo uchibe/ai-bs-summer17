@@ -21,7 +21,6 @@ RUN apt-get -y install libxrandr2 libxinerama-dev libxi6 libxcursor-dev
 
 ENV PATH /opt/conda/bin:$PATH
 
-# ========== Add codebase stub ==========
 CMD mkdir /root/code
 ADD environment.yml /root/code/environment.yml
 RUN conda env create -f /root/code/environment.yml
