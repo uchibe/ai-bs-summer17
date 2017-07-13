@@ -29,3 +29,6 @@ RUN conda env create -f /root/code/environment.yml
 RUN echo "source activate aibs" >> /root/.bashrc
 ENV BASH_ENV /root/.bashrc
 WORKDIR /root/code
+
+# OpenAI Gym
+RUN pip install rllab[all] baselines
