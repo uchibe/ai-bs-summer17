@@ -30,4 +30,4 @@ ENV BASH_ENV /root/.bashrc
 WORKDIR /root/code
 
 # OpenAI Gym
-RUN pip install rllab[all] baselines
+RUN pip install gym[all] baselines
