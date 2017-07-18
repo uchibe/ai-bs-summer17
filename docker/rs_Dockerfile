@@ -27,18 +27,38 @@ RUN conda env create -f /root/code/environment.yml
 
 RUN echo "source activate aibs" >> /root/.bashrc
 ENV BASH_ENV /root/.bashrc
+WORKDIR /root/code
 
 # OpenAI Gym
 RUN pip install gym[all] baselines
 
-# bullet3
-WORKDIR /root
-RUN git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self_collision \
- && mkdir -p ~/bullet3/build \
- && cd ~/bullet3/build \
- && cmake -DBUILD_SHARED_LIBS=ON -DUSE_DOUBLE_PRECISION=1 -DCMAKE_INSTALL_PREFIX:PATH=$ROBOSCHOOL_PATH/roboschool/cpp-household/bullet_local_install -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF  -DBUILD_UNIT_TESTS=OFF -DBUILD_CLSOCKET=OFF -DBUILD_ENET=OFF -DBUILD_OPENGL3_DEMOS=OFF .. \
- && make install 
+#--------------------
+# Install ROS
+#--------------------
+# setup sources.list
+RUN echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list
 
-# RUN git clone --depth 1 https://github.com/openai/roboschool
+# setup keys
+RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 421C365BD9FF1F717815A3895523BAEEB01FA116
+
+# install bootstrap tools
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    python-rosdep \
+    python-rosinstall \
+    python-vcstools \
+    ros-kinetic-desktop-full \
+    && rm -rf /var/lib/apt/lists/*
+
+# bootstrap rosdep
+RUN rosdep init \
+    && rosdep update
+
+#
+RUN echo 'source /opt/ros/kinetic/setup.bash' >> ~/.bashrc
+ENV BASH_ENV ~/.bashrc
+
+#--------------------
+# Install Deep Learning
+#--------------------
 
 WORKDIR /root/code
