@@ -1,7 +1,10 @@
 FROM ubuntu:16.04
 
-# ========== Anaconda ==========
-# https://github.com/ContinuumIO/docker-images/blob/master/anaconda/Dockerfile
+ARG PROJECT_NAME="ai-bs-summer17"
+
+############################################
+# Anaconda
+############################################
 RUN apt-get update --fix-missing && apt-get install -y wget bzip2 ca-certificates \
     libglib2.0-0 libxext6 libsm6 libxrender1 \
     git mercurial subversion 
@@ -21,19 +24,21 @@ RUN apt-get -y install libxrandr2 libxinerama-dev libxi6 libxcursor-dev
 
 ENV PATH /opt/conda/bin:$PATH
 
-CMD mkdir /root/code
-ADD environment.yml /root/code/environment.yml
-RUN conda env create -f /root/code/environment.yml
+CMD mkdir /root/${PROJECT_NAME}
+ADD environment.yml /root/${PROJECT_NAME}/environment.yml
+RUN conda env create -f /root/${PROJECT_NAME}/environment.yml
 
 RUN echo "source activate aibs" >> /root/.bashrc
 ENV BASH_ENV /root/.bashrc
 
+############################################
 # OpenAI Gym
+############################################
 RUN pip install gym[all] baselines
 
-#--------------------
-# Install ROS
-#--------------------
+############################################
+# ROS
+############################################
 # Install ROS Kinetic
 # setup sources.list
 RUN echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list
@@ -64,10 +69,8 @@ RUN apt-get update && apt-get install -y python-rosinstall ros-kinetic-octomap r
 ## install MAVProxy
 RUN pip install future empy
 RUN apt-get install -y libxml2-dev libxslt1-dev libtool automake autoconf libexpat1-dev
-RUN pip install pymavlink catkin_pkg --upgrade
+RUN pip install pymavlink catkin_pkg rospkg
 RUN pip install MAVProxy==1.5.2
-
-# 
 
 ## Install ArUco
 ENV PKG_CONFIG_PATH /opt/ros/kinetic/lib/pkgconfig
@@ -93,8 +96,10 @@ RUN mkdir -p ~/simulation \
   && make install
 
 # Create ROS workspace
-RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash \
-  && mkdir -p ~/simulation/ros_catkin_ws/src \
+RUN pip install catkin_pkg rospkg --upgrade
+ENV BASH_ENV /opt/ros/kinetic/setup.bash
+# /bin/bash -c "source /opt/ros/kinetic/setup.bash \
+RUN /bin/bash -c "mkdir -p ~/simulation/ros_catkin_ws/src \
   && cd ~/simulation/ros_catkin_ws/src \
   && catkin_init_workspace \
   && cd ~/simulation/ros_catkin_ws \
@@ -113,5 +118,10 @@ RUN git clone --depth 1 https://github.com/erlerobot/ardupilot_sitl_gazebo_plugi
   && git clone --depth 1 https://github.com/erlerobot/gazebo_cpp_examples \
   && git clone --depth 1 https://github.com/erlerobot/gazebo_python_examples
 
-# ENV BASH_ENV ~/.bashrc
+RUN /bin/bash -c "cd ~/simulation/ros_catkin_ws \
+  && source devel/setup.bash \
+  && catkin_make --pkg driver_base mav_msgs mavros_msgs gazebo_msgs \
+  && source devel/setup.bash \
+  && catkin_make -j 4"
 
+# ENV BASH_ENV ~/.bashrc

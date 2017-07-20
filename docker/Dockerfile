@@ -1,7 +1,10 @@
 FROM ubuntu:16.04
 
-# ========== Anaconda ==========
-# https://github.com/ContinuumIO/docker-images/blob/master/anaconda/Dockerfile
+ARG PROJECT_NAME="ai-bs-summer17"
+
+############################################
+# Anaconda
+############################################
 RUN apt-get update --fix-missing && apt-get install -y wget bzip2 ca-certificates \
     libglib2.0-0 libxext6 libsm6 libxrender1 \
     git mercurial subversion 
@@ -21,14 +24,16 @@ RUN apt-get -y install libxrandr2 libxinerama-dev libxi6 libxcursor-dev
 
 ENV PATH /opt/conda/bin:$PATH
 
-CMD mkdir /root/code
-ADD environment.yml /root/code/environment.yml
-RUN conda env create -f /root/code/environment.yml
+CMD mkdir /root/${PROJECT_NAME}
+ADD environment.yml /root/${PROJECT_NAME}/environment.yml
+RUN conda env create -f /root/${PROJECT_NAME}/environment.yml
 
 RUN echo "source activate aibs" >> /root/.bashrc
 ENV BASH_ENV /root/.bashrc
 
+############################################
 # OpenAI Gym
+############################################
 RUN pip install gym[all] baselines
 
 # bullet3
@@ -41,4 +46,4 @@ RUN git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self
 
 # RUN git clone --depth 1 https://github.com/openai/roboschool
 
-WORKDIR /root/code
+WORKDIR /root/${PROJECT_NAME}
