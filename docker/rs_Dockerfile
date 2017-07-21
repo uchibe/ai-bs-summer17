@@ -36,92 +36,14 @@ ENV BASH_ENV /root/.bashrc
 ############################################
 RUN pip install gym[all] baselines
 
-############################################
-# ROS
-############################################
-# Install ROS Kinetic
-# setup sources.list
-RUN echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list
-
-# setup keys
-RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 421C365BD9FF1F717815A3895523BAEEB01FA116
-
-# install bootstrap tools
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    python-rosdep \
-    python-rosinstall \
-    python-vcstools \
-    ros-kinetic-desktop-full \
-    && rm -rf /var/lib/apt/lists/*
-
-# bootstrap rosdep
-RUN rosdep init \
-    && rosdep update
-RUN echo 'source /opt/ros/kinetic/setup.bash' >> ~/.bashrc
-
-#
-ENV BASH_ENV ~/.bashrc
-RUN apt-get update && apt-get install -y python-rosinstall ros-kinetic-octomap ros-kinetic-joy \
-    ros-kinetic-geodesy ros-kinetic-octomap-ros ros-kinetic-mavlink \
-    ros-kinetic-control-toolbox ros-kinetic-transmission-interface \
-    ros-kinetic-joint-limits-interface unzip -y
-			
-## install MAVProxy
-RUN pip install future empy
-RUN apt-get install -y libxml2-dev libxslt1-dev libtool automake autoconf libexpat1-dev
-RUN pip install pymavlink catkin_pkg rospkg
-RUN pip install MAVProxy==1.5.2
-
-## Install ArUco
-ENV PKG_CONFIG_PATH /opt/ros/kinetic/lib/pkgconfig
-ENV OpenCV_DIR /opt/ros/kinetic/share/OpenCV-3.2.0-dev
+# bullet3
 WORKDIR /root
-RUN wget https://sourceforge.net/projects/aruco/files/OldVersions/aruco-1.3.0.tgz \
-  && tar xvfz aruco-1.3.0.tgz
-COPY docker/aruco*.cpp /root/aruco-1.3.0/utils/
-RUN mkdir -p ~/aruco-1.3.0/build \
-  && cd ~/aruco-1.3.0/build \
-  && cmake .. \
-  && make \
-  && make install
+RUN git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self_collision \
+ && mkdir -p ~/bullet3/build \
+ && cd ~/bullet3/build \
+ && cmake -DBUILD_SHARED_LIBS=ON -DUSE_DOUBLE_PRECISION=1 -DCMAKE_INSTALL_PREFIX:PATH=$ROBOSCHOOL_PATH/roboschool/cpp-household/bullet_local_install -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF  -DBUILD_UNIT_TESTS=OFF -DBUILD_CLSOCKET=OFF -DBUILD_ENET=OFF -DBUILD_OPENGL3_DEMOS=OFF .. \
+ && make install 
 
-# Install APM/Ardupilot
-RUN mkdir -p ~/simulation \
-  && cd ~/simulation \
-  && git clone --depth 1 https://github.com/erlerobot/ardupilot -b gazebo \
-  && git clone --depth 1 git://github.com/tridge/jsbsim.git \
-  && cd jsbsim \
-  && ./autogen.sh --enable-libraries \
-  && make \
-  && make install
+# RUN git clone --depth 1 https://github.com/openai/roboschool
 
-# Create ROS workspace
-RUN pip install catkin_pkg rospkg --upgrade
-ENV BASH_ENV /opt/ros/kinetic/setup.bash
-# /bin/bash -c "source /opt/ros/kinetic/setup.bash \
-RUN /bin/bash -c "mkdir -p ~/simulation/ros_catkin_ws/src \
-  && cd ~/simulation/ros_catkin_ws/src \
-  && catkin_init_workspace \
-  && cd ~/simulation/ros_catkin_ws \
-  && catkin_make"
-  
-WORKDIR /root/simulation/ros_catkin_ws/src
-RUN git clone --depth 1 https://github.com/erlerobot/ardupilot_sitl_gazebo_plugin \
-  && git clone --depth 1 https://github.com/tu-darmstadt-ros-pkg/hector_gazebo/ \
-  && git clone --depth 1 https://github.com/erlerobot/rotors_simulator -b sonar_plugin \
-  && git clone --depth 1 https://github.com/PX4/mav_comm.git \
-  && git clone --depth 1 https://github.com/ethz-asl/glog_catkin.git \
-  && git clone --depth 1 https://github.com/catkin/catkin_simple.git \
-  && git clone --depth 1 https://github.com/erlerobot/mavros.git \
-  && git clone --depth 1 https://github.com/ros-simulation/gazebo_ros_pkgs.git -b kinetic-devel \
-  && git clone --depth 1 https://github.com/ros-drivers/driver_common.git \
-  && git clone --depth 1 https://github.com/erlerobot/gazebo_cpp_examples \
-  && git clone --depth 1 https://github.com/erlerobot/gazebo_python_examples
-
-RUN /bin/bash -c "cd ~/simulation/ros_catkin_ws \
-  && source devel/setup.bash \
-  && catkin_make --pkg driver_base mav_msgs mavros_msgs gazebo_msgs \
-  && source devel/setup.bash \
-  && catkin_make -j 4"
-
-# ENV BASH_ENV ~/.bashrc
+WORKDIR /root/${PROJECT_NAME}
