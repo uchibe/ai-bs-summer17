@@ -90,10 +90,10 @@ RUN apt-get update \
 ############################################
 # Create a local user account
 ############################################
-# RUN adduser docker
-# ENV HOME /home/docker
-# USER docker
-# WORKDIR ${HOME}
+RUN adduser docker
+ENV HOME /home/docker
+USER docker
+WORKDIR ${HOME}
 
 ############################################
 # Python3.5 as default (if you need)
