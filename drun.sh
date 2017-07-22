@@ -2,20 +2,29 @@
 
 export PROJECT_NAME="ai-bs-summer17"
 
-#docker build --force-rm=true -t uchibe/cpu:1.0 -f docker/Dockerfile .
+# docker run -itd --name jupyter -p 8888:8888 -p 6006:6006 -v $HOME/data:/root/notebook -e PASSWORD=aibs enakai00/jupyter_tensorflow:0.10.0-cp27
+
+#docker build --force-rm=true -t uchibe/aibs_roboschool_cpu:1.0 \
+#  -f docker/rs_Dockerfile .
+
 #docker run -it --init --net=host --env="DISPLAY" \
-#  --env="QT_X11_NO_MITSHM=1" -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-#  -v /etc/machine-id:/etc/machine-id:ro -v /var/run/dbus:/var/run/dbus \
-#  -v ~/.Xauthority:/root/.Xauthority -v ${PWD}:/root/ai-bs-summer17:rw \
-#  uchibe/cpu:1.0 /bin/bash
+#       --env="QT_X11_NO_MITSHM=1" \
+#       --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+#       --volume="/etc/machine-id:/etc/machine-id:ro" \
+#       --volume="/var/run/dbus:/var/run/dbus" \
+#       --volume= ~/.Xauthority:/root/.Xauthority \
+#       --volume="${PWD}:/root/ai-bs-summer17:rw" \
+#       uchibe/aibs_roboschool_cpu:1.0 /bin/bash
 
 #docker build --force-rm=true -t uchibe/aibs_ros_cpu:1.0 -f docker/Dockerfile .
+
 #       --user=$(id -u):$(id -g) \
 #       --workdir="/home/$USER" \
 #      --volume="/etc/group:/etc/group:ro" \
 #       --volume="/etc/passwd:/etc/passwd:ro" \
 #       --volume="/etc/shadow:/etc/shadow:ro" \
 #       --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
+
 docker run -it --init --net=host --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
        --volume="${PWD}:/home/$USER/$PROJECT_NAME" \
