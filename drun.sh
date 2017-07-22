@@ -7,13 +7,12 @@ export PROJECT_NAME="ai-bs-summer17"
 #docker build --force-rm=true -t uchibe/aibs_roboschool_cpu:1.0 \
 #  -f docker/rs_Dockerfile .
 
-#       -v = ${HOME}/.Xauthority:/root/.Xauthority \
 docker run -it --init --net=host --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
        --volume="/etc/machine-id:/etc/machine-id:ro" \
        --volume="/var/run/dbus:/var/run/dbus" \
-       -v ${PWD}:${HOME}/ai-bs-summer17:rw \
+       -v ${PWD}:/home/docker/ai-bs-summer17:rw \
        --user=$(id -u):$(id -g) \
        uchibe/aibs_roboschool_cpu:1.0 /bin/bash
 

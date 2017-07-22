@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04
 
 MAINTAINER Eiji Uchibe <uchibe@atr.jp>
 
@@ -79,6 +79,10 @@ RUN mkdir -p /opt/bullet3/build \
     && make install
 
 RUN pip3 install -e ${ROBOSCHOOL_PATH}
+
+# Tensorflow (GPU)
+RUN pip3 uninstall tensorflow \
+    && pip3 install tensorflow-gpu
 
 ############################################
 # locate
