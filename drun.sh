@@ -7,14 +7,15 @@ export PROJECT_NAME="ai-bs-summer17"
 #docker build --force-rm=true -t uchibe/aibs_roboschool_cpu:1.0 \
 #  -f docker/rs_Dockerfile .
 
-#docker run -it --init --net=host --env="DISPLAY" \
-#       --env="QT_X11_NO_MITSHM=1" \
-#       --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-#       --volume="/etc/machine-id:/etc/machine-id:ro" \
-#       --volume="/var/run/dbus:/var/run/dbus" \
-#       --volume= ~/.Xauthority:/root/.Xauthority \
-#       --volume="${PWD}:/root/ai-bs-summer17:rw" \
-#       uchibe/aibs_roboschool_cpu:1.0 /bin/bash
+#       -v = ${HOME}/.Xauthority:/root/.Xauthority \
+docker run -it --init --net=host --env="DISPLAY" \
+       --env="QT_X11_NO_MITSHM=1" \
+       --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+       --volume="/etc/machine-id:/etc/machine-id:ro" \
+       --volume="/var/run/dbus:/var/run/dbus" \
+       -v ${PWD}:${HOME}/ai-bs-summer17:rw \
+       --user=$(id -u):$(id -g) \
+       uchibe/aibs_roboschool_cpu:1.0 /bin/bash
 
 #docker build --force-rm=true -t uchibe/aibs_ros_cpu:1.0 -f docker/Dockerfile .
 
@@ -25,14 +26,14 @@ export PROJECT_NAME="ai-bs-summer17"
 #       --volume="/etc/shadow:/etc/shadow:ro" \
 #       --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
 
-docker run -it --init --net=host --env="DISPLAY" \
-       --env="QT_X11_NO_MITSHM=1" \
-       --volume="${PWD}:/home/$USER/$PROJECT_NAME" \
-       --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-       --volume="/etc/machine-id:/etc/machine-id:ro" \
-       --volume="/var/run/dbus:/var/run/dbus" \
-       --volume="/home/$USER/.Xauthority:/home/$USER/.Xauthority" \
-       uchibe/aibs_ros_cpu:1.0 /bin/bash
+#docker run -it --init --net=host --env="DISPLAY" \
+#       --env="QT_X11_NO_MITSHM=1" \
+#       --volume="${PWD}:/home/$USER/$PROJECT_NAME" \
+#       --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+#       --volume="/etc/machine-id:/etc/machine-id:ro" \
+#       --volume="/var/run/dbus:/var/run/dbus" \
+#       --volume="/home/$USER/.Xauthority:/home/$USER/.Xauthority" \
+#       uchibe/aibs_ros_cpu:1.0 /bin/bash
 
 #docker run -it --init --net=host --env="DISPLAY" \
 #  --env="QT_X11_NO_MITSHM=1" -v /tmp/.X11-unix:/tmp/.X11-unix:rw \

@@ -3,47 +3,51 @@ FROM ubuntu:16.04
 ARG PROJECT_NAME="ai-bs-summer17"
 
 ############################################
-# Anaconda
-############################################
-RUN apt-get update --fix-missing && apt-get install -y wget bzip2 ca-certificates \
-    libglib2.0-0 libxext6 libsm6 libxrender1 \
-    git mercurial subversion 
-
-RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
-    wget  --no-check-certificate --quiet https://repo.continuum.io/archive/Anaconda3-4.4.0-Linux-x86_64.sh -O ~/anaconda.sh && \
-    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
-    rm ~/anaconda.sh
-
-RUN apt-get install -y unzip curl grep sed dpkg && apt-get clean
-RUN apt-get -y install git make cmake unzip zlib1g-dev libjpeg-dev xvfb \
-    libav-tools xorg-dev libboost-all-dev libsdl2-dev swig
-# ALE requires zlib
-# MUJOCO requires graphics stuff (Why?)
-RUN apt-get -y build-dep glfw
-RUN apt-get -y install libxrandr2 libxinerama-dev libxi6 libxcursor-dev
-
-ENV PATH /opt/conda/bin:$PATH
-
-CMD mkdir /root/${PROJECT_NAME}
-ADD environment.yml /root/${PROJECT_NAME}/environment.yml
-RUN conda env create -f /root/${PROJECT_NAME}/environment.yml
-
-RUN echo "source activate aibs" >> /root/.bashrc
-ENV BASH_ENV /root/.bashrc
-
-############################################
 # OpenAI Gym
 ############################################
-RUN pip install gym[all] baselines
+RUN apt-get update --fix-missing \
+    && apt-get install -y python-numpy python-dev cmake \
+    zlib1g-dev libjpeg-dev xvfb libav-tools xorg-dev \
+    python-opengl libboost-all-dev libsdl2-dev swig mlocate \
+    python-pip
 
-# bullet3
-#WORKDIR /root
-#RUN git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self_collision \
-# && mkdir -p ~/bullet3/build \
-# && cd ~/bullet3/build \
-# && cmake -DBUILD_SHARED_LIBS=ON -DUSE_DOUBLE_PRECISION=1 -DCMAKE_INSTALL_PREFIX:PATH=$ROBOSCHOOL_PATH/roboschool/cpp-household/bullet_local_install -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF  -DBUILD_UNIT_TESTS=OFF -DBUILD_CLSOCKET=OFF -DBUILD_ENET=OFF -DBUILD_OPENGL3_DEMOS=OFF .. \
-# && make install 
+RUN pip install --upgrade pip
+RUN pip install 'gym[all]'
 
-# RUN git clone --depth 1 https://github.com/openai/roboschool
+############################################
+# Deep Learning
+############################################
+RUN pip install tensorflow keras
 
-WORKDIR /root/${PROJECT_NAME}
+############################################
+# Roboschool
+############################################
+RUN apt-get update \
+    && apt-get install -y git cmake ffmpeg pkg-config \
+    qtbase5-dev libqt5opengl5-dev libassimp-dev \
+    libpython3.5-dev libboost-python-dev libtinyxml-dev
+
+# Create a local user account
+RUN adduser docker
+ENV HOME /home/docker
+USER docker
+WORKDIR ${HOME}
+
+RUN git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self_collision \
+    && git clone --depth 1 https://github.com/openai/roboschool
+# export ROBOSCHOOL_PATH=/root/roboschool
+ENV ROBOSCHOOL_PATH ${HOME}/roboschool
+RUN mkdir -p ${HOME}/bullet3/build \
+    && cd ${HOME}/bullet3/build \
+    && cmake -DBUILD_SHARED_LIBS=ON -DUSE_DOUBLE_PRECISION=1 \
+       -DCMAKE_INSTALL_PREFIX:PATH=${ROBOSCHOOL_PATH}/roboschool/cpp-household/bullet_local_install \
+       -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF \
+       -DBUILD_EXTRAS=OFF  -DBUILD_UNIT_TESTS=OFF \
+       -DBUILD_CLSOCKET=OFF -DBUILD_ENET=OFF \
+       -DBUILD_OPENGL3_DEMOS=OFF .. \
+    && make \
+    && make install
+
+USER root
+RUN pip install --no-cache-dir -e ${ROBOSCHOOL_PATH}
+
