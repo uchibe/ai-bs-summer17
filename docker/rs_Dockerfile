@@ -11,8 +11,7 @@ RUN apt-get update --fix-missing \
     python-dev python3-dev cmake \
     zlib1g-dev libjpeg-dev xvfb libav-tools xorg-dev \
     python-opengl python3-opengl python-pip python3-pip \
-    libboost-all-dev libsdl2-dev swig \
-    python-pip python3-pip
+    libboost-all-dev libsdl2-dev swig
 
 RUN pip install --upgrade pip
 RUN pip3 install --upgrade pip
@@ -27,7 +26,7 @@ RUN apt-get update \
        libjpeg8-dev libtiff5-dev libjasper-dev libpng12-dev \
        libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
        libxvidcore-dev libx264-dev libgtk-3-dev \
-       libatlas-base-dev gfortran wget unzip
+       libatlas-base-dev gfortran wget unzip git
 WORKDIR /opt
 RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/3.1.0.zip \
     && wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/3.1.0.zip \
@@ -49,8 +48,6 @@ RUN mkdir -p /opt/opencv-3.1.0/build \
 # (2017/07/22) PPO and TRPO are not installed by
 #     pip3 install baselines
 ############################################
-RUN apt-get update \
-    && apt-get install -y git 
 RUN git clone --depth 1 https://github.com/openai/baselines.git \
     && pip3 install -e baselines
 # RUN pip3 install mpi4py

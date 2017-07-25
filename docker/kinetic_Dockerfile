@@ -26,14 +26,15 @@ RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C3
 
 # Installation
 RUN apt-get update && apt-get install -y ros-kinetic-desktop-full
-RUN apt-get install -y python-rosdep python-rosinstall python-vcstools
+RUN apt-get install -y python-rosinstall python-rosinstall-generator \
+    python-wstool build-essential
 
 # bootstrap rosdep
-# RUN rosdep init \
-#    && rosdep update
+RUN rosdep init \
+   && rosdep update
 
-# RUN echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
-# ENV BASH_ENV ~/.bashrc
+RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+ENV BASH_ENV ~/.bashrc
 
 ## install MAVProxy
 # RUN pip install future empy
