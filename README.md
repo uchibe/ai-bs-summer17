@@ -19,7 +19,7 @@ python3 -m baselines.deepq.experiments.enjoy_pong
 ```
 ### Pretrained model
 ```sh
-python3 $ROBOSCHOOL_PATH/agent_zoo/RoboschoolHumanoidFlagrun_v0_2017may.py
+python3 $ROBOSCHOOL_PATH/agent_zoo/RoboschoolHumanoidFlagrun_v1_2017jul.py
 ```
 
 ```sh
