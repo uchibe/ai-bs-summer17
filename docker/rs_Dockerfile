@@ -7,6 +7,7 @@ MAINTAINER Eiji Uchibe <uchibe@atr.jp>
 ############################################
 RUN apt-get update --fix-missing \
     && apt-get install -y python-numpy python3-numpy \
+    python-matplotlib python3-matplotlib \
     python-dev python3-dev cmake \
     zlib1g-dev libjpeg-dev xvfb libav-tools xorg-dev \
     python-opengl python3-opengl python-pip python3-pip \
@@ -90,10 +91,10 @@ RUN apt-get update \
 ############################################
 # Create a local user account
 ############################################
-RUN adduser docker
-ENV HOME /home/docker
-USER docker
-WORKDIR ${HOME}
+# RUN adduser docker
+# ENV HOME /home/docker
+# USER docker
+# WORKDIR ${HOME}
 
 ############################################
 # Python3.5 as default (if you need)

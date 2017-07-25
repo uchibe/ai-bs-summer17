@@ -7,7 +7,7 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-if [ $1 = "ros_cpu" ]; then
+if [ $1 = "indigo_cpu" ]; then
     IMAGE_NAME="uchibe/indigo_cpu:1.0"
     DOCKER_FILE="docker/indigo_Dockerfile"
 elif [ $1 = "kinetic_cpu" ]; then
