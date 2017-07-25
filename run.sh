@@ -34,5 +34,6 @@ docker run --init --net=host \
      --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
      --volume="/etc/machine-id:/etc/machine-id:ro" \
      --volume="/var/run/dbus:/var/run/dbus" \
+     -v ${HOME}/.Xauthority:/root/.Xauthority \
      -v ${PWD}:/root/$PROJECT_NAME \
      -it $IMAGE_NAME /bin/bash
