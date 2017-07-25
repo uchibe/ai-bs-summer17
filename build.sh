@@ -8,10 +8,13 @@ if [ "$#" -ne 1 ]; then
 fi
 
 if [ $1 = "ros_cpu" ]; then
-    IMAGE_NAME="uchibe/aibs_ros_cpu:1.0"
-    DOCKER_FILE="docker/Dockerfile"
+    IMAGE_NAME="uchibe/indigo_cpu:1.0"
+    DOCKER_FILE="docker/indigo_Dockerfile"
+elif [ $1 = "kinetic_cpu" ]; then
+    IMAGE_NAME="uchibe/kinetic_cpu:1.0"
+    DOCKER_FILE="docker/kinetic_Dockerfile"
 elif [ $1 = "roboschool_cpu" ]; then
-    IMAGE_NAME="uchibe/aibs_roboschool_cpu:1.0"
+    IMAGE_NAME="uchibe/roboschool_cpu:1.0"
     DOCKER_FILE="docker/rs_Dockerfile"
 else
     echo "Invalid PROJECT"
@@ -22,10 +25,6 @@ fi
 pushd `dirname $0` > /dev/null
 SCRIPT_PATH=`pwd`
 popd > /dev/null
-
-echo $SCRIPT_PATH
-echo $IMAGE_NAME
-echo $DOCKER_FILE
 
 # Build the docker image
 # --build-arg user=$USER \

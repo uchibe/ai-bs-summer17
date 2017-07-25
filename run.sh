@@ -7,10 +7,12 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-if [ $1 = "ros_cpu" ]; then
-    IMAGE_NAME="uchibe/aibs_ros_cpu:1.0"
+if [ $1 = "indigo_cpu" ]; then
+    IMAGE_NAME="uchibe/indigo_cpu:1.0"
+elif [ $1 = "kinetic_cpu" ]; then
+    IMAGE_NAME="uchibe/kinetic_cpu:1.0"
 elif [ $1 = "roboschool_cpu" ]; then
-    IMAGE_NAME="uchibe/aibs_roboschool_cpu:1.0"
+    IMAGE_NAME="uchibe/roboschool_cpu:1.0"
 else
     echo "Invalid PROJECT"
     exit 1
