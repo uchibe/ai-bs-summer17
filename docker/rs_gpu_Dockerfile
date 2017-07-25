@@ -26,63 +26,84 @@ RUN apt-get update \
        libjpeg8-dev libtiff5-dev libjasper-dev libpng12-dev \
        libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
        libxvidcore-dev libx264-dev libgtk-3-dev \
-       libatlas-base-dev gfortran wget unzip
+       libatlas-base-dev gfortran wget unzip git
 WORKDIR /opt
 RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/3.1.0.zip \
     && wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/3.1.0.zip \
     && unzip opencv.zip \
     && unzip opencv_contrib.zip
+
+# Since nvcc cannot compile opencv-3.1.0/modules/cudalegcy/src/graphcuts.cpp,
+# it should be replaced with the correct one.
+# See also the following page.
+#http://answers.opencv.org/question/95148/cudalegacy-not-compile-nppigraphcut-missing/
+COPY docker/graphcuts.cpp /opt/opencv-3.1.0/modules/cudalegacy/src/
+
 RUN mkdir -p /opt/opencv-3.1.0/build \
     && cd /opt/opencv-3.1.0/build \
     && cmake -D CMAKE_BUILD_TYPE=RELEASE \
        -D CMAKE_INSTALL_PREFIX=/usr/local \
        -D INSTALL_PYTHON_EXAMPLES=OFF \
        -D INSTALL_C_EXAMPLES=OFF \
-       -D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-3.1.0/modules \
+      -D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-3.1.0/modules \
        -D BUILD_EXAMPLES=OFF .. \
     && make \
-    && make install \
-    && make clean
+    && make install 
 
 ############################################
 # OpenAI Baselines
 # (2017/07/22) PPO and TRPO are not installed by
 #     pip3 install baselines
 ############################################
-RUN apt-get update \
-    && apt-get install -y git 
-RUN git clone --depth 1 https://github.com/openai/baselines.git \
-    && pip3 install -e baselines
-# RUN pip3 install mpi4py
+#RUN git clone --depth 1 https://github.com/openai/baselines.git \
+#    && pip3 install -e baselines
+## RUN pip3 install mpi4py
 
 ############################################
 # Roboschool
 ############################################
-RUN apt-get update \
-    && apt-get install -y git cmake ffmpeg pkg-config \
-    qtbase5-dev libqt5opengl5-dev libassimp-dev \
-    libpython3.5-dev libboost-python-dev libtinyxml-dev
+#RUN apt-get update \
+#    && apt-get install -y git cmake ffmpeg pkg-config \
+#    qtbase5-dev libqt5opengl5-dev libassimp-dev \
+#    libpython3.5-dev libboost-python-dev libtinyxml-dev
 
-RUN git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self_collision \
-    && git clone --depth 1 https://github.com/openai/roboschool
+#RUN git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self_collision \
+#    && git clone --depth 1 https://github.com/openai/roboschool
 # export ROBOSCHOOL_PATH=/opt/roboschool
-ENV ROBOSCHOOL_PATH /opt/roboschool
-RUN mkdir -p /opt/bullet3/build \
-    && cd /opt/bullet3/build \
-    && cmake -DBUILD_SHARED_LIBS=ON -DUSE_DOUBLE_PRECISION=1 \
-       -DCMAKE_INSTALL_PREFIX:PATH=${ROBOSCHOOL_PATH}/roboschool/cpp-household/bullet_local_install \
-       -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF \
-       -DBUILD_EXTRAS=OFF  -DBUILD_UNIT_TESTS=OFF \
-       -DBUILD_CLSOCKET=OFF -DBUILD_ENET=OFF \
-       -DBUILD_OPENGL3_DEMOS=OFF .. \
-    && make \
-    && make install
+#ENV ROBOSCHOOL_PATH /opt/roboschool
+#RUN mkdir -p /opt/bullet3/build \
+#    && cd /opt/bullet3/build \
+#    && cmake -DBUILD_SHARED_LIBS=ON -DUSE_DOUBLE_PRECISION=1 \
+#       -DCMAKE_INSTALL_PREFIX:PATH=${ROBOSCHOOL_PATH}/roboschool/cpp-household/bullet_local_install \
+#       -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF \
+#       -DBUILD_EXTRAS=OFF  -DBUILD_UNIT_TESTS=OFF \
+#       -DBUILD_CLSOCKET=OFF -DBUILD_ENET=OFF \
+#       -DBUILD_OPENGL3_DEMOS=OFF .. \
+#    && make \
+#    && make install
 
-RUN pip3 install -e ${ROBOSCHOOL_PATH}
+#RUN pip3 install -e ${ROBOSCHOOL_PATH}
+
+############################################
+# Theano (GPU)
+# http://deeplearning.net/software/theano/tutorial/using_gpu.html
+############################################
+#RUN pip3 install Cython nose
+#RUN git clone https://github.com/Theano/libgpuarray.git \
+#    && cd libgpuarray \
+#    && git checkout tags/v0.6.2 -b v0.6.2 \
+#    && mkdir -p build \
+#    && cd build \
+#    && cmake -DCMAKE_BUILD_TYPE=Release .. \
+#    && make \
+#    && make install \
+#    && cd .. \
+#    && python3 setup.py build \
+#    && python3 setup.py install
 
 # Tensorflow (GPU)
-RUN pip3 uninstall tensorflow \
-    && pip3 install tensorflow-gpu
+#RUN pip3 uninstall tensorflow \
+#    && pip3 install tensorflow-gpu
 
 ############################################
 # locate

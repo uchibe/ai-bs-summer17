@@ -3,16 +3,22 @@
 
 # Check args
 if [ "$#" -ne 1 ]; then
-    echo "Usage: ./build.sh PROJECT"
+    echo "Usage: ./run.sh PROJECT"
     exit 1
 fi
 
 if [ $1 = "indigo_cpu" ]; then
+    DOCKER_COMMAND="docker"
     IMAGE_NAME="uchibe/indigo_cpu:1.0"
 elif [ $1 = "kinetic_cpu" ]; then
+    DOCKER_COMMAND="docker"
     IMAGE_NAME="uchibe/kinetic_cpu:1.0"
 elif [ $1 = "roboschool_cpu" ]; then
+    DOCKER_COMMAND="docker"
     IMAGE_NAME="uchibe/roboschool_cpu:1.0"
+elif [ $1 = "roboschool_gpu" ]; then
+    DOCKER_COMMAND="nvidia-docker"
+    IMAGE_NAME="uchibe/roboschool_gpu:1.0"
 else
     echo "Invalid PROJECT"
     exit 1
@@ -28,7 +34,7 @@ PROJECT_NAME="ai-bs-summer17"
 # Run the container with shared X11
 #     -v $HOME/.Xauthority:$HOME/.Xauthority" \
 #     --user=$(id -u):$(id -g) \
-docker run --init --net=host \
+$DOCKER_COMMAND run --init --net=host \
      --env="DISPLAY" \
      --env="QT_X11_NO_MITSHM=1" \
      --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
