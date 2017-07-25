@@ -8,7 +8,7 @@ MAINTAINER Eiji Uchibe <uchibe@atr.jp>
 # Basic utilities
 RUN apt-get -y update \
     && apt-get install -y git screen tree sudo ssh synaptic \
-    locales
+    locales lsb-release
 
 ############################################
 # ROS
@@ -19,14 +19,14 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 
 # Set up sources.list
-# RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list
+RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list
 
 # Set up your keys
-# RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 
 # Installation
-# RUN apt-get update && apt-get install -y ros-kinetic-desktop-full
-# RUN apt-get install -y python-rosdep python-rosinstall python-vcstools
+RUN apt-get update && apt-get install -y ros-kinetic-desktop-full
+RUN apt-get install -y python-rosdep python-rosinstall python-vcstools
 
 # bootstrap rosdep
 # RUN rosdep init \
