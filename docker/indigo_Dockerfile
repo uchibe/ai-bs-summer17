@@ -178,5 +178,20 @@ RUN /bin/bash -c "source /opt/ros/indigo/setup.bash \
     && catkin_make --pkg mav_msgs \
     && source devel/setup.bash \
     && catkin_make -j 1"
-#WORKDIR ${HOME}
-#WORKDIR /home/docker/catkin_ws/src
+
+# copy altered urdf model
+RUN cp -r /opt/gym-gazebo/gym_gazebo/envs/assets/urdf/kobuki_urdf/urdf/ \
+    ${HOME}/catkin_ws/src/kobuki/kobuki_description 
+
+# copy laser mesh file
+RUN cp /opt/gym-gazebo/gym_gazebo/envs/assets/meshes/lidar_lite_v2_withRay.dae \
+    ${HOME}/catkin_ws/src/kobuki/kobuki_description/meshes
+
+WORKDIR ${HOME}
+
+############################################
+# locate
+############################################
+RUN apt-get update \
+    && apt-get install -y mlocate \
+    && updatedb
