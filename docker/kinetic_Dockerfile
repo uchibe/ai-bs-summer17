@@ -31,68 +31,132 @@ RUN apt-get install -y python-rosinstall python-rosinstall-generator \
 
 # bootstrap rosdep
 RUN rosdep init \
-   && rosdep update
+    && rosdep update
 
 RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 ENV BASH_ENV ~/.bashrc
 
-## install MAVProxy
-# RUN pip install future empy
-# RUN apt-get install -y libxml2-dev libxslt1-dev libtool automake autoconf libexpat1-dev
-# RUN pip install pymavlink catkin_pkg rospkg
-# RUN pip install MAVProxy==1.5.2
+############################################
+# OpenAI Gym
+############################################
+RUN apt-get update --fix-missing \
+    && apt-get install -y python-numpy \
+    python-matplotlib \
+    python-dev cmake \
+    zlib1g-dev libjpeg-dev xvfb libav-tools xorg-dev \
+    python-opengl python-pip \
+    libboost-all-dev libsdl2-dev swig
 
-## Install ArUco
-# ENV PKG_CONFIG_PATH /opt/ros/kinetic/lib/pkgconfig
-# ENV OpenCV_DIR /opt/ros/kinetic/share/OpenCV-3.2.0-dev
-# WORKDIR /root
-# RUN wget https://sourceforge.net/projects/aruco/files/OldVersions/aruco-1.3.0.tgz \
-#   && tar xvfz aruco-1.3.0.tgz
-# COPY docker/aruco*.cpp /root/aruco-1.3.0/utils/
-# RUN mkdir -p ~/aruco-1.3.0/build \
-#   && cd ~/aruco-1.3.0/build \
-#   && cmake .. \
-#   && make \
-#   && make install
+RUN pip install --upgrade pip
+RUN pip install 'gym[all]'
+
+############################################
+# Gazebo
+############################################
+# setup environment
+EXPOSE 11345
+
+# Install additional dependencies
+RUN apt-get install -y ros-kinetic-cv-bridge \
+    ros-kinetic-robot-state-publisher
+
+############################################
+# Theano and Keras
+#   Tensorflow is also installed with Keras
+############################################
+RUN pip install h5py
+RUN apt-get install -y gfortran python-skimage psmisc
+RUN pip install Theano keras
+ENV KERAS_BACKEND=theano
+
+
+############################################
+# Gym-Gazebo
+############################################
+RUN apt-get update \
+    && apt-get install -y git mercurial \
+    libsdl-image1.2-dev libspnav-dev libtbb-dev \
+    libtbb2 libusb-dev libftdi-dev \
+    pyqt4-dev-tools python-vcstool python-pip \
+    g++ ccache realpath \
+    libopencv-dev libtool libtool-bin libexpat1-dev libtinyxml2-dev \
+    automake autoconf gawk psmisc
+
+RUN apt-get update \
+    && apt-get install -y ros-kinetic-bfl \
+    ros-kinetic-mavlink ros-kinetic-octomap-msgs \
+    ros-kinetic-octomap-ros \
+    ros-kinetic-joy ros-kinetic-geodesy \
+    ros-kinetic-control-toolbox \
+    ros-kinetic-pluginlib \
+    ros-kinetic-navigation \
+    ros-kinetic-trajectory-msgs \
+    ros-kinetic-control-msgs \
+    ros-kinetic-std-srvs \
+    ros-kinetic-nodelet \
+    ros-kinetic-urdf \
+    ros-kinetic-rviz \
+    ros-kinetic-kdl-conversions \
+    ros-kinetic-eigen-conversions \
+    ros-kinetic-tf2-sensor-msgs \
+    ros-kinetic-pcl-ros 
+
+#RUN easy_install numpy
+#RUN easy_install --upgrade numpy
+#RUN pip install --upgrade matplotlib
+RUN pip2 install pymavlink MAVProxy catkin_pkg --upgrade
+
+# Install Sophus
+WORKDIR /opt
+RUN git clone --depth 1 https://github.com/stonier/sophus -b indigo \
+    && mkdir -p sophus/build \
+    && cd sophus/build \
+    && cmake .. \
+    && make \
+    && make install
 
 # Install APM/Ardupilot
-# RUN mkdir -p ~/simulation \
-#   && cd ~/simulation \
-#   && git clone --depth 1 https://github.com/erlerobot/ardupilot -b gazebo \
-#   && git clone --depth 1 git://github.com/tridge/jsbsim.git \
-#   && cd jsbsim \
-#   && ./autogen.sh --enable-libraries \
-#   && make \
-#   && make install
+RUN mkdir apm \
+    && cd apm \
+    && git clone --depth 1 https://github.com/erlerobot/ardupilot.git -b gazebo_udp \
+    && git clone --depth 1 https://github.com/tridge/jsbsim.git \
+    && cd jsbsim \
+    && ./autogen.sh --enable-libraries \
+    && make \
+    && make install
 
-# Create ROS workspace
-# RUN pip install vcstool catkin_pkg rospkg
-# ENV BASH_ENV /opt/ros/kinetic/setup.bash
-# /bin/bash -c "source /opt/ros/kinetic/setup.bash \
-# RUN /bin/bash -c "mkdir -p ~/simulation/catkin_ws/src \
-#   && cd ~/simulation/catkin_ws/src \
-#   && catkin_init_workspace \
-#   && cd ~/simulation/catkin_ws \
-#   && catkin_make"
+# Download and install gym-gazebo
+RUN git clone --depth 1 https://github.com/erlerobot/gym-gazebo.git \
+    && cd gym-gazebo \
+    && pip install -e .
 
-  
-# WORKDIR /root/simulation/catkin_ws/src
-# RUN git clone --depth 1 https://github.com/erlerobot/ardupilot_sitl_gazebo_plugin \
-#   && git clone --depth 1 https://github.com/tu-darmstadt-ros-pkg/hector_gazebo/ \
-#   && git clone --depth 1 https://github.com/erlerobot/rotors_simulator -b sonar_plugin \
-#   && git clone --depth 1 https://github.com/PX4/mav_comm.git \
-#   && git clone --depth 1 https://github.com/ethz-asl/glog_catkin.git \
-#   && git clone --depth 1 https://github.com/catkin/catkin_simple.git \
-#   && git clone --depth 1 https://github.com/erlerobot/mavros.git \
-#   && git clone --depth 1 https://github.com/ros-simulation/gazebo_ros_pkgs.git -b kinetic-devel \
-#   && git clone --depth 1 https://github.com/ros-drivers/driver_common.git \
-#   && git clone --depth 1 https://github.com/erlerobot/gazebo_cpp_examples \
-#   && git clone --depth 1 https://github.com/erlerobot/gazebo_python_examples
+# Install dependencies
+RUN apt-get update \
+    && apt-get install -y libbluetooth-dev libcwiid1 \
+    libcwiid-dev lswm wmgui wminput
+ADD docker/kinetic_gazebo.repos /tmp/gazebo.repos
 
-# RUN /bin/bash -c "cd ~/simulation/catkin_ws \
-#   && source devel/setup.bash \
-#   && catkin_make --pkg driver_base mav_msgs mavros_msgs gazebo_msgs \
-#   && source devel/setup.bash \
-#   && catkin_make -j 4"
+ENV HOME /root
 
-# ENV BASH_ENV ~/.bashrc
+RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash \
+    && mkdir -p ${HOME}/catkin_ws/src \
+    && cd ${HOME}/catkin_ws/src \
+    && catkin_init_workspace \
+    && cd .. \
+    && catkin_make"
+RUN /bin/bash -c "cd ${HOME}/catkin_ws/src \
+    && vcs import < /tmp/gazebo.repos"
+#RUN apt-get install -y siv-dev python-qt4-dev python-sip-dev pyqt4-dev-tools
+#RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash \
+#   && cd ${HOME}/catkin_ws \
+#    && catkin_make --pkg mav_msgs \
+#    && source devel/setup.bash \
+#    && catkin_make -j 1"
+
+
+############################################
+# locate
+############################################
+RUN apt-get update \
+    && apt-get install -y mlocate \
+    && updatedb
