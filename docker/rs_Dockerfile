@@ -42,6 +42,7 @@ RUN mkdir -p /opt/opencv-3.1.0/build \
        -D BUILD_EXAMPLES=OFF .. \
     && make \
     && make install
+RUN ldconfig
 
 ############################################
 # OpenAI Baselines
@@ -74,6 +75,7 @@ RUN mkdir -p /opt/bullet3/build \
        -DBUILD_OPENGL3_DEMOS=OFF .. \
     && make \
     && make install
+RUN ldconfig
 
 RUN pip3 install -e ${ROBOSCHOOL_PATH}
 
