@@ -6,11 +6,11 @@ repositories:
   ar_track_alvar:
     type: git
     url: https://github.com/sniekum/ar_track_alvar
-    version: indigo-devel
-  ar_track_alvar_msgs:
-    type: git
-    url: https://github.com/sniekum/ar_track_alvar_msgs
-    version: indigo-devel
+    version: kinetic-devel
+#  ar_track_alvar_msgs:
+#    type: git
+#    url: https://github.com/sniekum/ar_track_alvar_msgs
+#    version: indigo-devel
   catkin_simple:
     type: git
     url: https://github.com/catkin/catkin_simple
@@ -18,7 +18,7 @@ repositories:
   control_toolbox:
     type: git
     url: https://github.com/ros-controls/control_toolbox
-    version: indigo-devel
+    version: kinetic-devel
 #  drcsim:
 #    type: hg
 #    url: https://bitbucket.org/osrf/drcsim
@@ -46,7 +46,7 @@ repositories:
   gazebo_ros_pkgs:
     type: git
     url: https://github.com/ros-simulation/gazebo_ros_pkgs
-    version: indigo-devel
+    version: kinetic-devel
   glog_catkin:
     type: git
     url: https://github.com/ethz-asl/glog_catkin.git
@@ -54,7 +54,7 @@ repositories:
   hector_gazebo:
     type: git
     url: https://github.com/tu-darmstadt-ros-pkg/hector_gazebo/
-    version: indigo-devel
+    version: kinetic-devel
   image_common:
     type: git
     url: https://github.com/ros-perception/image_common
@@ -66,19 +66,19 @@ repositories:
   kobuki:
     type: git
     url: https://github.com/yujinrobot/kobuki
-    version: indigo
+    version: kinetic
   kobuki_core:
     type: git
     url: https://github.com/yujinrobot/kobuki_core
-    version: indigo
+    version: kinetic
   kobuki_desktop:
     type: git
     url: https://github.com/erlerobot/kobuki_desktop
-    version: indigo
+    version: kinetic
   kobuki_msgs:
     type: git
     url: https://github.com/yujinrobot/kobuki_msgs
-    version: indigo
+    version: kinetic
   mavros:
     type: git
     url: https://github.com/erlerobot/mavros
@@ -90,7 +90,7 @@ repositories:
   navigation:
     type: git
     url: https://github.com/ros-planning/navigation
-    version: indigo-devel
+    version: kinetic-devel
   osrf-common:
     type: hg
     url: https://bitbucket.org/osrf/osrf-common
@@ -98,7 +98,7 @@ repositories:
   pcl_ros:
     type: git
     url: https://github.com/ros-perception/perception_pcl
-    version: indigo-devel
+    version: kinetic-devel
   python_qt_binding:
     type: git
     url: https://github.com/ros-visualization/python_qt_binding
@@ -110,11 +110,11 @@ repositories:
   realtime_tools:
     type: git
     url: https://github.com/ros-controls/realtime_tools
-    version: indigo-devel
+    version: kinetic-devel
   ros_control:
     type: git
     url: https://github.com/ros-controls/ros_control
-    version: indigo-devel
+    version: kinetic-devel
   roslint:
     type: git
     url: https://github.com/ros/roslint
@@ -142,7 +142,7 @@ repositories:
   turtlebot:
     type: git
     url: https://github.com/turtlebot/turtlebot
-    version: indigo
+    version: kinetic
   turtlebot_create:
     type: git
     url: https://github.com/turtlebot/turtlebot_create
@@ -154,12 +154,12 @@ repositories:
   xacro:
     type: git
     url: https://github.com/ros/xacro
-    version: indigo-devel
+    version: kinetic-devel
   yocs_msgs:
     type: git
     url: https://github.com/yujinrobot/yocs_msgs
-    version: release/0.6-indigo
+    version: release/0.6-kinetic
   yujin_ocs:
     type: git
     url: https://github.com/yujinrobot/yujin_ocs
-    version: indigo-devel
+    version: kinetic

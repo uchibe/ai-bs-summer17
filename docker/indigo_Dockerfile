@@ -40,22 +40,6 @@ RUN rosdep init \
 RUN echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
 ENV BASH_ENV ~/.bashrc
 
-# Dependencies required to build rviz
-# RUN apt-get install -y \
-#     qt4-dev-tools libqt5core5a libqt5dbus5 libqt5gui5 \
-#     libwayland-client0 libwayland-server0 libxcb-icccm4 \
-#     libxcb-image0 libxcb-keysyms1 libxcb-render-util0 \
-#     libxcb-util0 libxcb-xkb1 libxkbcommon-x11-0 libxkbcommon0
-
-# 
-#RUN apt-get install -y \
-#    xorg-dev libgl1-mesa-dev xvfb libxinerama1 libxcursor1 \
-#    unzip libglu1-mesa libav-tools python-numpy python-scipy \
-#    python-pyglet python-setuptools libpq-dev libjpeg-dev \
-#    wget curl cmake git \
-#    && easy_install pip
-#RUN pip install --upgrade pip 
-
 ############################################
 # OpenAI Gym
 ############################################
