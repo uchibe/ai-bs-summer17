@@ -9,27 +9,27 @@ fi
 
 if [ $1 = "indigo_cpu" ]; then
     DOCKER_COMMAND="docker"
-    IMAGE_NAME="uchibe/indigo_cpu:1.0"
+    IMAGE_NAME="uchibe/indigo_cpu"
     DOCKER_FILE="docker/indigo_Dockerfile"
 elif [ $1 = "kinetic_cpu" ]; then
     DOCKER_COMMAND="docker"
-    IMAGE_NAME="uchibe/kinetic_cpu:1.0"
+    IMAGE_NAME="uchibe/kinetic_cpu"
     DOCKER_FILE="docker/kinetic_Dockerfile"
 elif [ $1 = "lw_indigo" ]; then
     DOCKER_COMMAND="docker"
-    IMAGE_NAME="uchibe/lw_indigo:1.0"
+    IMAGE_NAME="uchibe/lw_indigo"
     DOCKER_FILE="docker/lw_indigo_Dockerfile"
 elif [ $1 = "lw_kinetic" ]; then
     DOCKER_COMMAND="docker"
-    IMAGE_NAME="uchibe/lw_kinetic:1.0"
+    IMAGE_NAME="uchibe/lw_kinetic"
     DOCKER_FILE="docker/lw_kinetic_Dockerfile"
 elif [ $1 = "roboschool_cpu" ]; then
     DOCKER_COMMAND="docker"
-    IMAGE_NAME="uchibe/roboschool_cpu:1.0"
+    IMAGE_NAME="uchibe/roboschool_cpu"
     DOCKER_FILE="docker/rs_Dockerfile"
 elif [ $1 = "roboschool_gpu" ]; then
     DOCKER_COMMAND="nvidia-docker"
-    IMAGE_NAME="uchibe/roboschool_gpu:1.0"
+    IMAGE_NAME="uchibe/roboschool_gpu"
     DOCKER_FILE="docker/rs_gpu_Dockerfile"
 else
     echo "Invalid PROJECT"
