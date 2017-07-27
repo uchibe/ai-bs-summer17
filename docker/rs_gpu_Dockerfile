@@ -3,40 +3,67 @@ FROM nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04
 MAINTAINER Eiji Uchibe <uchibe@atr.jp>
 
 ############################################
+# Basic dependencies
+############################################
+RUN apt-get update --fix-missing && apt-get install -y \
+      python3-numpy python3-matplotlib python3-dev \
+      python3-opengl python3-pip \
+      cmake zlib1g-dev libjpeg-dev xvfb libav-tools \
+      xorg-dev libboost-all-dev libsdl2-dev swig \
+      git \
+    && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
+
+############################################
+# Change the working directory
+############################################
+WORKDIR /opt
+
+############################################
+# Theano (GPU)
+# http://deeplearning.net/software/theano/tutorial/using_gpu.html
+############################################
+RUN pip3 install --upgrade pip \
+    && pip3 install Cython nose \
+    && git clone https://github.com/Theano/libgpuarray.git \
+    && cd libgpuarray \
+    && git checkout tags/v0.6.2 -b v0.6.2 \
+    && mkdir -p build \
+    && cd build \
+    && cmake -DCMAKE_BUILD_TYPE=Release .. \
+    && make \
+    && make install \
+    && ldconfig \
+    && cd .. \
+    && python3 setup.py build \
+    && python3 setup.py install \
+    && pip3 install theano
+
+############################################
+# Tensorflow (GPU) and Keras
 # OpenAI Gym
 ############################################
-RUN apt-get update --fix-missing \
-    && apt-get install -y python-numpy python3-numpy \
-    python-matplotlib python3-matplotlib \
-    python-dev python3-dev cmake \
-    zlib1g-dev libjpeg-dev xvfb libav-tools xorg-dev \
-    python-opengl python3-opengl python-pip python3-pip \
-    libboost-all-dev libsdl2-dev swig
-
-RUN pip install --upgrade pip
-RUN pip3 install --upgrade pip
-RUN pip3 install 'gym[all]'
+RUN pip3 install h5py tensorflow-gpu keras 'gym[all]'
 
 ############################################
 # OpenCV
 # http://www.pyimagesearch.com/2016/10/24/ubuntu-16-04-how-to-install-opencv/
 ############################################
-RUN apt-get update \
-    && apt-get install -y build-essential cmake pkg-config \
-       libjpeg8-dev libtiff5-dev libjasper-dev libpng12-dev \
-       libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
-       libxvidcore-dev libx264-dev libgtk-3-dev \
-       libatlas-base-dev gfortran wget unzip git
-WORKDIR /opt
-RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/3.1.0.zip \
+RUN apt-get update && apt-get install -y \
+      build-essential cmake pkg-config libjpeg8-dev libtiff5-dev \
+      libjasper-dev libpng12-dev libavcodec-dev libavformat-dev \
+      libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libgtk-3-dev \
+      libatlas-base-dev gfortran wget unzip git \
+    && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* \
+    && wget -O opencv.zip https://github.com/opencv/opencv/archive/3.1.0.zip \
     && wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/3.1.0.zip \
     && unzip opencv.zip \
-    && unzip opencv_contrib.zip
+    && unzip opencv_contrib.zip \
+    && rm -rf opencv.zip opencv_contrib.zip
 
 # Since nvcc cannot compile opencv-3.1.0/modules/cudalegcy/src/graphcuts.cpp,
 # it should be replaced with the correct one.
 # See also the following page.
-#http://answers.opencv.org/question/95148/cudalegacy-not-compile-nppigraphcut-missing/
+# http://answers.opencv.org/question/95148/cudalegacy-not-compile-nppigraphcut-missing/
 COPY docker/graphcuts.cpp /opt/opencv-3.1.0/modules/cudalegacy/src/
 
 RUN mkdir -p /opt/opencv-3.1.0/build \
@@ -48,71 +75,51 @@ RUN mkdir -p /opt/opencv-3.1.0/build \
        -D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-3.1.0/modules \
        -D BUILD_EXAMPLES=OFF .. \
     && make \
-    && make install
-RUN ldconfig
+    && make install \
+    && ldconfig \
+    && make clean
 
 ############################################
 # OpenAI Baselines
 # (2017/07/22) PPO and TRPO are not installed by
 #     pip3 install baselines
 ############################################
-RUN git clone --depth 1 https://github.com/openai/baselines.git \
-    && pip3 install -e baselines
+#RUN git clone --depth 1 https://github.com/openai/baselines.git \
+#    && pip3 install -e baselines
 ## RUN pip3 install mpi4py
 
 ############################################
 # Roboschool
 ############################################
-RUN apt-get update \
-    && apt-get install -y git cmake ffmpeg pkg-config \
-    qtbase5-dev libqt5opengl5-dev libassimp-dev \
-    libpython3.5-dev libboost-python-dev libtinyxml-dev
+#RUN apt-get update \
+#    && apt-get install -y git cmake ffmpeg pkg-config \
+#    qtbase5-dev libqt5opengl5-dev libassimp-dev \
+#    libpython3.5-dev libboost-python-dev libtinyxml-dev
 
-RUN git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self_collision \
-    && git clone --depth 1 https://github.com/openai/roboschool
+#RUN git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self_collision \
+#    && git clone --depth 1 https://github.com/openai/roboschool
 # export ROBOSCHOOL_PATH=/opt/roboschool
-ENV ROBOSCHOOL_PATH /opt/roboschool
-RUN mkdir -p /opt/bullet3/build \
-    && cd /opt/bullet3/build \
-    && cmake -DBUILD_SHARED_LIBS=ON -DUSE_DOUBLE_PRECISION=1 \
-       -DCMAKE_INSTALL_PREFIX:PATH=${ROBOSCHOOL_PATH}/roboschool/cpp-household/bullet_local_install \
-       -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF \
-       -DBUILD_EXTRAS=OFF  -DBUILD_UNIT_TESTS=OFF \
-       -DBUILD_CLSOCKET=OFF -DBUILD_ENET=OFF \
-       -DBUILD_OPENGL3_DEMOS=OFF .. \
-    && make \
-    && make install
-RUN ldconfig
+#ENV ROBOSCHOOL_PATH /opt/roboschool
+#RUN mkdir -p /opt/bullet3/build \
+#    && cd /opt/bullet3/build \
+#    && cmake -DBUILD_SHARED_LIBS=ON -DUSE_DOUBLE_PRECISION=1 \
+#       -DCMAKE_INSTALL_PREFIX:PATH=${ROBOSCHOOL_PATH}/roboschool/cpp-household/bullet_local_install \
+#       -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF \
+#       -DBUILD_EXTRAS=OFF  -DBUILD_UNIT_TESTS=OFF \
+#       -DBUILD_CLSOCKET=OFF -DBUILD_ENET=OFF \
+#       -DBUILD_OPENGL3_DEMOS=OFF .. \
+#    && make \
+#    && make install
+#RUN ldconfig
 
-RUN pip3 install -e ${ROBOSCHOOL_PATH}
-
-############################################
-# Theano (GPU)
-# http://deeplearning.net/software/theano/tutorial/using_gpu.html
-############################################
-RUN pip3 install Cython nose
-RUN git clone https://github.com/Theano/libgpuarray.git \
-    && cd libgpuarray \
-    && git checkout tags/v0.6.2 -b v0.6.2 \
-    && mkdir -p build \
-    && cd build \
-    && cmake -DCMAKE_BUILD_TYPE=Release .. \
-    && make \
-    && make install \
-    && cd .. \
-    && python3 setup.py build \
-    && python3 setup.py install
-RUN ldconfig
-
-# Tensorflow (GPU)
-RUN pip3 install tensorflow-gpu
+#RUN pip3 install -e ${ROBOSCHOOL_PATH}
 
 ############################################
 # locate
 ############################################
-RUN apt-get update \
-    && apt-get install -y mlocate \
-    && updatedb
+#RUN apt-get update \
+#    && apt-get install -y mlocate \
+#    && updatedb
 
 ############################################
 # Create a local user account
