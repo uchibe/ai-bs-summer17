@@ -20,7 +20,7 @@ RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 ENV BASH_ENV ~/.bashrc
 
 ############################################
-  Tensorflow, Theano and Keras
+# Tensorflow, Theano and Keras
 # OpenAI Gym
 ############################################
 RUN apt-get update && apt-get install -y \
