@@ -41,8 +41,13 @@ RUN pip3 install --upgrade pip \
 ############################################
 # Tensorflow (GPU) and Keras
 # OpenAI Gym
+#
+# It seems that keras always use the module installed last. 
+# https://github.com/fchollet/keras/issues/6997
 ############################################
-RUN pip3 install h5py tensorflow-gpu keras 'gym[all]'
+RUN pip3 install h5py \
+      keras tensorflow-gpu \
+      'gym[all]'
 
 ############################################
 # OpenCV
@@ -84,58 +89,46 @@ RUN mkdir -p /opt/opencv-3.1.0/build \
 # (2017/07/22) PPO and TRPO are not installed by
 #     pip3 install baselines
 ############################################
-#RUN git clone --depth 1 https://github.com/openai/baselines.git \
-#    && pip3 install -e baselines
+RUN git clone --depth 1 https://github.com/openai/baselines.git \
+    && pip3 install -e baselines
 ## RUN pip3 install mpi4py
 
 ############################################
 # Roboschool
 ############################################
-#RUN apt-get update \
-#    && apt-get install -y git cmake ffmpeg pkg-config \
-#    qtbase5-dev libqt5opengl5-dev libassimp-dev \
-#    libpython3.5-dev libboost-python-dev libtinyxml-dev
+RUN apt-get update && apt-get install -y \
+      git cmake ffmpeg pkg-config \
+      qtbase5-dev libqt5opengl5-dev libassimp-dev \
+      libpython3.5-dev libboost-python-dev libtinyxml-dev \
+    && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* \
+    && git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self_collision \
+    && git clone --depth 1 https://github.com/openai/roboschool
 
-#RUN git clone --depth 1 https://github.com/olegklimov/bullet3 -b roboschool_self_collision \
-#    && git clone --depth 1 https://github.com/openai/roboschool
 # export ROBOSCHOOL_PATH=/opt/roboschool
-#ENV ROBOSCHOOL_PATH /opt/roboschool
-#RUN mkdir -p /opt/bullet3/build \
-#    && cd /opt/bullet3/build \
-#    && cmake -DBUILD_SHARED_LIBS=ON -DUSE_DOUBLE_PRECISION=1 \
-#       -DCMAKE_INSTALL_PREFIX:PATH=${ROBOSCHOOL_PATH}/roboschool/cpp-household/bullet_local_install \
-#       -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF \
-#       -DBUILD_EXTRAS=OFF  -DBUILD_UNIT_TESTS=OFF \
-#       -DBUILD_CLSOCKET=OFF -DBUILD_ENET=OFF \
-#       -DBUILD_OPENGL3_DEMOS=OFF .. \
-#    && make \
-#    && make install
-#RUN ldconfig
+ENV ROBOSCHOOL_PATH /opt/roboschool
 
-#RUN pip3 install -e ${ROBOSCHOOL_PATH}
+RUN mkdir -p /opt/bullet3/build \
+    && cd /opt/bullet3/build \
+    && cmake -DBUILD_SHARED_LIBS=ON -DUSE_DOUBLE_PRECISION=1 \
+       -DCMAKE_INSTALL_PREFIX:PATH=${ROBOSCHOOL_PATH}/roboschool/cpp-household/bullet_local_install \
+       -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF \
+       -DBUILD_EXTRAS=OFF  -DBUILD_UNIT_TESTS=OFF \
+       -DBUILD_CLSOCKET=OFF -DBUILD_ENET=OFF \
+       -DBUILD_OPENGL3_DEMOS=OFF .. \
+    && make \
+    && make install \
+    && pip3 install -e ${ROBOSCHOOL_PATH} \
+    && ldconfig \
+    && make clean
 
 ############################################
 # locate
 ############################################
-#RUN apt-get update \
-#    && apt-get install -y mlocate \
-#    && updatedb
+RUN apt-get update && apt-get install -y mlocate \
+    && updatedb \
+    && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
 ############################################
-# Create a local user account
+# Change the working directory
 ############################################
-# RUN adduser docker
-# ENV HOME /home/docker
-# USER docker
-# WORKDIR ${HOME}
-
-############################################
-# Python3.5 as default (if you need)
-############################################
-#RUN apt-get update --fix-missing \
-#    && apt-get install -y python python2.7 python3.5
-#RUN mv /usr/bin/python /usr/bin/python.bak \
-#    && update-alternatives --install /usr/bin/python python /usr/bin/python2.7 2 \
-#    && update-alternatives --install /usr/bin/python python /usr/bin/python3.5 1 \
-#    && update-alternatives --set python /usr/bin/python3.5
-
+WORKDIR /root
