@@ -3,8 +3,7 @@ FROM ubuntu:16.04
 MAINTAINER Eiji Uchibe <uchibe@atr.jp>
 
 ############################################
-# Tensorflow, Theano and Keras
-# OpenAI Gym
+# Basic dependencies
 ############################################
 RUN apt-get update --fix-missing && apt-get install -y \
       python3-numpy python3-matplotlib python3-dev \
@@ -12,9 +11,6 @@ RUN apt-get update --fix-missing && apt-get install -y \
       cmake zlib1g-dev libjpeg-dev xvfb libav-tools \
       xorg-dev libboost-all-dev libsdl2-dev swig \
     && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
-
-RUN pip3 install --upgrade pip \
-    && pip3 install h5py tensorflow Theano keras 'gym[all]'
 
 ############################################
 # Change the working directory
@@ -49,6 +45,13 @@ RUN mkdir -p /opt/opencv-3.1.0/build \
     && make install \
     && ldconfig \
     && make clean
+
+############################################
+# Tensorflow, Theano and Keras
+# OpenAI Gym
+############################################
+RUN pip3 install --upgrade pip \
+    && pip3 install h5py tensorflow Theano keras 'gym[all]'
 
 ############################################
 # OpenAI Baselines
