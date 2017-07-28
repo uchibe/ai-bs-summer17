@@ -4,6 +4,22 @@ MAINTAINER Eiji Uchibe <uchibe@atr.jp>
 MAINTAINER Jiexin Wang <wang-j@atr.jp>
 
 ############################################
+# Since the gazebo installed by ros-kinetic-desktop-full
+# in Ubuntu 16.04, there exists the z-ordering problem.
+# See the following page for more details.
+# https://bitbucket.org/osrf/gazebo/issues/1837/vmware-rendering-z-ordering-appears-random
+# Install the latest version according to
+# http://gazebosim.org/tutorials?cat=install&tut=install_from_source&ver=default
+############################################
+RUN apt-get update && apt-get install -y \
+      git wget \
+    && sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list' \
+    && wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add - \
+    && apt-get update \
+    && apt-get install -y gazebo7 \
+    && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
+
+############################################
 # ROS Kinetic
 #   Turtlebot
 #   http://answers.ros.org/question/246015/installing-utrtlebot-on-ros-kinetic/
@@ -15,9 +31,6 @@ RUN apt-get update && apt-get install -y \
       python-wstool \
       build-essential git \
     && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
-
-RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
-ENV BASH_ENV ~/.bashrc
 
 ############################################
 # Tensorflow, Theano and Keras
@@ -33,3 +46,55 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install --upgrade pip \
     && pip install h5py tensorflow Theano keras 'gym[all]'
+
+############################################
+# locate, less, and vim
+############################################
+RUN apt-get update && apt-get install -y mlocate less vim \
+    && updatedb \
+    && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
+
+############################################
+# When catkin_create_pkg is executed, the username "root"
+# is shown in ~/catkin_ws/src/myturtle_gazebo/package.xml
+ENV HOME /root
+RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash \
+    && mkdir -p ${HOME}/catkin_ws/src \
+    && cd ${HOME}/catkin_ws/src \
+    && catkin_init_workspace \
+    && catkin_create_pkg myturtle_gazebo gazebo_ros rospy"
+
+# Copy the directory ai-bs-summer17/catkin_ws/src/myturtle_gazebo/ in local 
+# to ~/catkin_ws/src/ in the container.
+# Consequently, you will find in the directory:
+# CMakeLists.txt launch/ models/ myturtle_gazebo package.xml 
+# scripts/ src/ worlds/
+ADD catkin_ws/src/myturtle_gazebo ${HOME}/catkin_ws/src/myturtle_gazebo
+
+# Copy additional files. This is a quick hack.
+RUN mkdir -p /opt/ros/kinetic/share/kobuki_description/urdf/sensors
+
+COPY docker/lidar_lite_v2_withRay.dae \
+    /opt/ros/kinetic/share/kobuki_description/meshes/
+COPY docker/lidar_sensor.urdf.xacro \
+    /opt/ros/kinetic/share/kobuki_description/urdf/sensors/
+COPY docker/kobuki.urdf.xacro \
+    /opt/ros/kinetic/share/kobuki_description/urdf/
+
+RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash \
+    && cd ${HOME}/catkin_ws \
+    && catkin_make \
+    && echo 'source /opt/ros/kinetic/setup.bash' >> ${HOME}/.bashrc \
+    && echo 'source ${HOME}/catkin_ws/devel/setup.bash' >> ${HOME}/.bashrc \
+    && echo 'export PYTHONPATH=${HOME}/catkin_ws/src/myturtle_gazebo:$PYTHONPATH' >> ${HOME}/.bashrc"
+
+ENV BASH_ENV ~/.bashrc
+
+############################################
+# Change the working directory
+############################################
+WORKDIR /root
+
+# terminal 1
+# roslaunch myturtle_gazebo myturtle_simplemaze_brick.launch
+
