@@ -7,18 +7,9 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-if [ $1 = "indigo_cpu" ]; then
+if [ $1 = "ros_cpu" ]; then
     DOCKER_COMMAND="docker"
-    IMAGE_NAME="uchibe/indigo_cpu"
-elif [ $1 = "kinetic_cpu" ]; then
-    DOCKER_COMMAND="docker"
-    IMAGE_NAME="uchibe/kinetic_cpu"
-elif [ $1 = "lw_indigo" ]; then
-    DOCKER_COMMAND="docker"
-    IMAGE_NAME="uchibe/lw_indigo"
-elif [ $1 = "lw_kinetic" ]; then
-    DOCKER_COMMAND="docker"
-    IMAGE_NAME="uchibe/lw_kinetic"
+    IMAGE_NAME="uchibe/ros_cpu"
 elif [ $1 = "roboschool_cpu" ]; then
     DOCKER_COMMAND="docker"
     IMAGE_NAME="uchibe/roboschool_cpu"
@@ -47,5 +38,6 @@ $DOCKER_COMMAND run --init --net=host \
      --volume="/etc/machine-id:/etc/machine-id:ro" \
      --volume="/var/run/dbus:/var/run/dbus" \
      -v ${HOME}/.Xauthority:/root/.Xauthority \
+     -v /tmp/.gazebo/:/root/.gazebo/ \
      -v ${PWD}:/root/$PROJECT_NAME \
      -it $IMAGE_NAME /bin/bash
