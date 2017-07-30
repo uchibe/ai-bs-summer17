@@ -28,15 +28,25 @@ popd > /dev/null
 
 PROJECT_NAME="ai-bs-summer17"
 
-# Run the container with shared X11
-#     -v $HOME/.Xauthority:$HOME/.Xauthority" \
-#     --user=$(id -u):$(id -g) \
+# Run the container
+#
+# At first, you should do
+# $ xhost+
+# 
+#
+#
+# If you use the Intel driver, you need to expose the /dev/dri
+# to the docker container.
+#
+# See also http://wiki.ros.org/docker/Tutorials/Hardware%20Acceleration
+#
 $DOCKER_COMMAND run --init --net=host \
      --env="DISPLAY" \
      --env="QT_X11_NO_MITSHM=1" \
      --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
      --volume="/etc/machine-id:/etc/machine-id:ro" \
      --volume="/var/run/dbus:/var/run/dbus" \
+     --device="/dev/dri:/dev/dri" \
      -v ${HOME}/.Xauthority:/root/.Xauthority \
      -v /tmp/.gazebo/:/root/.gazebo/ \
      -v ${PWD}:/root/$PROJECT_NAME \
