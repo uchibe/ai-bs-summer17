@@ -3,7 +3,7 @@
 	<arg name="base" value="$(optenv TURTLEBOT_BASE kobuki)"/>
 	<arg name="battery" value="$(optenv TURTLEBOT_BATTERY /proc/acpi/battery/BAT0)"/>
 	<!--<arg name="paused" value="true"/> -->
-	<arg name="gui" default="true"/>
+	<arg name="gui" default="false"/>
 	<arg name="headless" value="true"/>
 	<arg name="stacks" value="$(optenv TURTLEBOT_STACKS hexagons)"/>
 	<arg name="3d_sensor" value="$(optenv TURTLEBOT_3D_SENSOR kinect)"/>
@@ -13,7 +13,7 @@
 		<arg name="debug" value="false"/>
 		<arg name="gui" value="$(arg gui)"/>
 		<arg name="world_name" value="$(find myturtle_gazebo)/worlds/simple_maze_brick.world" />
-		<arg name="verbose" value="false" />
+		<arg name="verbose" value="true" />
 	</include>
 
 	<include file="$(find turtlebot_gazebo)/launch/includes/$(arg base).launch.xml">

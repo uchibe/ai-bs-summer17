@@ -18,4 +18,5 @@ root@x260:roboschool# python3 $ROBOSCHOOL_PATH/agent_zoo/demo_race2.py
 
 ```sh
 root@x260:roboschool# python3 train_a3c_gym.py 8 --env RoboschoolInvertedPendulum-v1 --arch LSTMGaussian --t-max 50
+root@x260:roboschool# python3 train_ddpg_gym.py
 ```

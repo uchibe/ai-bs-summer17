@@ -1,7 +1,6 @@
 FROM osrf/ros:kinetic-desktop-full
 
 MAINTAINER Eiji Uchibe <uchibe@atr.jp>
-MAINTAINER Jiexin Wang <wang-j@atr.jp>
 
 ############################################
 # Since the gazebo installed by ros-kinetic-desktop-full

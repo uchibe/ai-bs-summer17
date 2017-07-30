@@ -10,12 +10,15 @@ fi
 if [ $1 = "ros_cpu" ]; then
     DOCKER_COMMAND="docker"
     IMAGE_NAME="uchibe/ros_cpu"
+    NAME="ros_cpu"
 elif [ $1 = "roboschool_cpu" ]; then
     DOCKER_COMMAND="docker"
     IMAGE_NAME="uchibe/roboschool_cpu"
+    NAME="roboschool_cpu"
 elif [ $1 = "roboschool_gpu" ]; then
     DOCKER_COMMAND="nvidia-docker"
     IMAGE_NAME="uchibe/roboschool_gpu"
+    NAME="roboschool_gpu"
 else
     echo "Invalid PROJECT"
     exit 1
@@ -50,4 +53,4 @@ $DOCKER_COMMAND run --init --net=host \
      -v ${HOME}/.Xauthority:/root/.Xauthority \
      -v /tmp/.gazebo/:/root/.gazebo/ \
      -v ${PWD}:/root/$PROJECT_NAME \
-     -it $IMAGE_NAME /bin/bash
+     --name $NAME -it $IMAGE_NAME bash
