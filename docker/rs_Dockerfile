@@ -50,7 +50,8 @@ RUN mkdir -p /opt/opencv-3.1.0/build \
 # OpenAI Gym, Tensorflow, Theano and Keras
 ############################################
 RUN pip3 install --upgrade pip \
-    && pip3 install h5py tensorflow Theano keras 'gym[all]'
+    && pip3 install h5py tensorflow Theano keras \
+      future chainer 'gym[all]'
 
 ############################################
 # Roboschool

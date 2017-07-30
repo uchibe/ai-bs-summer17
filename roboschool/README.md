@@ -9,3 +9,7 @@ python3 $ROBOSCHOOL_PATH/agent_zoo/RoboschoolHumanoidFlagrun_v1_2017jul.py
 ```sh
 python3 $ROBOSCHOOL_PATH/agent_zoo/demo_race2.py
 ```
+
+```sh
+python3 train_a3c_gym.py 4 --env RoboschoolInvertedPendulum-v1
+```
