@@ -55,12 +55,6 @@
             <resolution>0.01</resolution>
           </range>
         </ray>
-
-        <plugin name="gazebo_ros_${name}_controller" filename="librotors_gazebo_sonar_plugin.so">
-          <gaussianNoise>0.005</gaussianNoise>
-          <topicName>${ros_topic}</topicName>
-          <frameId>${name}_link</frameId>
-        </plugin>
   <plugin name="gazebo_ros_${name}_controller" filename="libgazebo_ros_laser.so">
           <topicName>/scan</topicName>
           <frameName>${name}_link</frameName>
