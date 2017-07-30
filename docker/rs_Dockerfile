@@ -47,20 +47,10 @@ RUN mkdir -p /opt/opencv-3.1.0/build \
     && make clean
 
 ############################################
-# Tensorflow, Theano and Keras
-# OpenAI Gym
+# OpenAI Gym, Tensorflow, Theano and Keras
 ############################################
 RUN pip3 install --upgrade pip \
     && pip3 install h5py tensorflow Theano keras 'gym[all]'
-
-############################################
-# OpenAI Baselines
-# (2017/07/22) PPO and TRPO are not installed by
-#     pip3 install baselines
-############################################
-RUN git clone --depth 1 https://github.com/openai/baselines.git \
-    && pip3 install -e baselines
-# RUN pip3 install mpi4py
 
 ############################################
 # Roboschool
@@ -89,6 +79,19 @@ RUN mkdir -p /opt/bullet3/build \
     && pip3 install -e ${ROBOSCHOOL_PATH} \
     && ldconfig \
     && make clean
+
+############################################
+# Deep Reinforcement Learning
+#    OpenAI Baselines
+#    Keras-RL
+#    ChainerRL
+# (2017/07/22) PPO and TRPO are not installed by
+#     pip3 install baselines
+############################################
+RUN pip3 install keras-rl chainerrl \
+    && git clone --depth 1 https://github.com/openai/baselines.git \
+    && pip3 install -e baselines \
+    && pip3 install mpi4py
 
 ############################################
 # locate
