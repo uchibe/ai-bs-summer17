@@ -95,9 +95,9 @@ RUN pip3 install keras-rl chainerrl \
     && pip3 install mpi4py
 
 ############################################
-# locate
+# locate, less, and vim
 ############################################
-RUN apt-get update && apt-get install -y mlocate \
+RUN apt-get update && apt-get install -y mlocate less vim \
     && updatedb \
     && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 

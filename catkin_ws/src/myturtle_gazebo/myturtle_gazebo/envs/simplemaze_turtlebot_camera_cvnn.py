@@ -5,6 +5,7 @@ import cv2
 import sys
 import os
 import random
+import math
 
 from gym import utils, spaces
 from geometry_msgs.msg import Twist
@@ -77,8 +78,8 @@ class SimplemazeTurtlebotCameraCvNnEnv(gym.Env):
             except:
                 pass
 
-        #bumped=self.calculate_observation(data)
-        done=self.calculate_observation(data)
+        bumped=self.calculate_observation(data)
+        #done=self.calculate_observation(data)
 
         depth_data=None
         success=False
@@ -146,6 +147,7 @@ class SimplemazeTurtlebotCameraCvNnEnv(gym.Env):
         if contours:
             cv2.drawContours(cv_image,contours,-1,(0,255,0),3)
             area=cv2.contourArea(contours[0])
+            distance=1000/(math.sqrt(area)+1)
             #print("area="+str(area))
         else:
             pass
@@ -153,14 +155,18 @@ class SimplemazeTurtlebotCameraCvNnEnv(gym.Env):
 
         #cv2.imshow("image window",cv_image)
         #cv2.waitKey(3)
-        
-        if not done:
+        done=False
+        distance=10
+        if not bumped:
             if contours:
                 reward=1
+                if 2.8<distance<3:
+                    done=True
             else:
                 reward=0
         else:
             reward=-1
+            done=True
         #print(bumped)
         '''
         if not bumped:
