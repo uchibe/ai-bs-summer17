@@ -18,26 +18,26 @@ def main():
 
     env = gym.wrappers.Monitor(env, outdir, force=True)
 
-    episodes = 10   # 600
-    steps = 150   # 150
+    number_of_episodes = 10   # number of episodes in one experimental run
+    max_steps_per_episode = 150   # maximum number of steps per episode
 
-    alpha = 1e-3
-    gamma = 0.99
+    alpha = 1e-3   # learning rate
+    gamma = 0.99   # discount factor
     EXPLORE = 20000  # 100000
     epsilon0 = 0.5  # 0.5
     epsilonf = 0.01
 
     output_size = 3
     memory_size = 10000
-    learnStart = 3000
+    learnStart = 3000   # The agent collects the data, but does not learn
     updateTarget = 3000
     deepQ = DeepQ(output_size, memory_size, gamma, alpha, learnStart, img_rows, img_cols, img_channels)
 
-    for iter in xrange(1):
-        epsilon = epsilon0   # 0.3236049
+    for iter in xrange(1):  # 1 experimental run
+        epsilon = epsilon0
         deepQ.initNetworks()
-        # deepQ.loadModel('0newModel_smcv_img_to259.h5')
-        # deepQ.loadTargetModel('0newModel_smcv_img_to259.h5')
+        # deepQ.loadModel('0newModel_smcv.h5')
+        # deepQ.loadTargetModel('0newModel_smcv.h5')
 
         rew = []
         stps = []
@@ -45,43 +45,31 @@ def main():
         losses = []
         batches = []
         qvalueep = []
-        stpCounter = 0
+        stepCounter = 0
 
-        for ep in xrange(episodes):
-
+        for ep in xrange(number_of_episodes):
             done = False
             o = env.reset()
             r_sum = 0
             loss = 0
             stp = 0
             qvalue = []
+            epsilon = epsilon0 - (epsilon0 - epsilonf)/number_of_episodes*ep
+            epsilon = 0.00001
 
-            for t in xrange(steps):
+            for t in xrange(max_steps_per_episode):
                 q = deepQ.getQValues(o)
-                # print(q)
-                # print('target:')
-                # print(deepQ.getTargetPredict(o))
                 qvalue.append(q)
                 a = deepQ.selectAction(q, epsilon)
-                # np.save(str(t) + 'state.npy', o)
-                # a = 0
                 newO, r, done, info = env.step(a)
                 deepQ.addMemory(o, a, r, newO, done)
                 o = newO
 
-                if epsilon > epsilonf and stpCounter > learnStart:
-                    epsilon -= (epsilon0 - epsilonf)/EXPLORE
-		epsilon = 0.001
-                if stpCounter >= learnStart:
-                    if stpCounter <= updateTarget:
-                        loss = deepQ.learnOnMini(False)
-                    else:
-                        loss = deepQ.learnOnMini(True)
+                if stepCounter >= learnStart:
+                    loss = deepQ.learnOnMini(True)
 
-                if(t == steps):
-                    # print("reached the end")
+                if t == max_steps_per_episode:
                     done = True
-                # deepQ.printNetwork()
 
                 r_sum += r
 
@@ -89,13 +77,13 @@ def main():
                     break
 
                 stp += 1
-                stpCounter += 1
+                stepCounter += 1
 
-                if stpCounter % updateTarget == 0:
+                if stepCounter % updateTarget == 0:
                     deepQ.updateTargetNetwork()
                     deepQ.saveModel(str(iter) + 'newModel_smcv.h5')
-                    print("model saved!")
-            print("Episode: " + str(ep) + " Steps: " + str(stp) + " Total steps: " + str(stpCounter) + " Total rewards: " + str(r_sum) + " Epsilon: " + str(epsilon))
+                    print("The target network is updated")
+            print("Episode: " + str(ep) + " Steps: " + str(stp) + " Total steps: " + str(stepCounter) + " Total rewards: " + str(r_sum) + " Epsilon: " + str(epsilon))
             # deepQ.printNetwork()
             losses.append(loss)
             stps.append(stp)

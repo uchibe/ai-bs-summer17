@@ -185,7 +185,7 @@ class DeepQ:
             if isFinal:
                 targets[i, a] = r
             else:
-                targets[i, a] = r + 0.99*np.max(Q_sa)
+                targets[i, a] = r + self.discountFactor*np.max(Q_sa)
 
             i += 1
 

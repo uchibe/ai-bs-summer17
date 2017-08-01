@@ -81,13 +81,12 @@ class SimplemazeTurtlebotCameraCvNnEnv(gym.Env):
 
         depth_data = None
         success = False
-        #cv_image=None
+        # cv_image = None
         image_data = None
         success_img = False
         
         while depth_data is None or success is False:
             try:
-                # print(1.5)
                 depth_data = rospy.wait_for_message('/camera/depth/image_raw', Image, timeout=5)
                 h = depth_data.height
                 w = depth_data.width
