@@ -127,13 +127,13 @@ RUN pip3 install keras-rl chainerrl \
 # keras selects tensorflow (CPU). So, I uninstall the cpu version,
 # and install the gpu version at the end.
 ############################################
-RUN pip uninstall -y tensorflow \
-    && pip install tensorflow-gpu
+RUN pip3 uninstall -y tensorflow \
+    && pip3 install tensorflow-gpu
 
 ############################################
-# locate
+# locate, less, and vim
 ############################################
-RUN apt-get update && apt-get install -y mlocate \
+RUN apt-get update && apt-get install -y mlocate less vim \
     && updatedb \
     && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
