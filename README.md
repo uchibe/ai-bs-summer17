@@ -7,6 +7,7 @@
 $ cd ai-bs-summer17
 ai-bs-summer17$ ./run ros_cpu
 ```
+Now, you are in the container. 
 
 ## Roboschool
 

@@ -18,8 +18,8 @@ def main():
 
     env = gym.wrappers.Monitor(env, outdir, force=True)
 
-    episodes = 1   # 600
-    steps = 1500   # 150
+    episodes = 10   # 600
+    steps = 150   # 150
 
     alpha = 1e-3
     gamma = 0.99
@@ -71,7 +71,7 @@ def main():
 
                 if epsilon > epsilonf and stpCounter > learnStart:
                     epsilon -= (epsilon0 - epsilonf)/EXPLORE
-
+		epsilon = 0.001
                 if stpCounter >= learnStart:
                     if stpCounter <= updateTarget:
                         loss = deepQ.learnOnMini(False)
@@ -95,7 +95,7 @@ def main():
                     deepQ.updateTargetNetwork()
                     deepQ.saveModel(str(iter) + 'newModel_smcv.h5')
                     print("model saved!")
-            print("Ep:" + str(ep) + " Stps:" + str(stp) + " Stps_all:" + str(stpCounter) + " R:" + str(r_sum) + " Epsilon:" + str(epsilon))
+            print("Episode: " + str(ep) + " Steps: " + str(stp) + " Total steps: " + str(stpCounter) + " Total rewards: " + str(r_sum) + " Epsilon: " + str(epsilon))
             # deepQ.printNetwork()
             losses.append(loss)
             stps.append(stp)
