@@ -105,12 +105,11 @@ class SimplemazeTurtlebotCameraCvNnEnv(gym.Env):
 
         while image_data is None or success_img is False:
             try:
-                # print(2)
                 image_data = rospy.wait_for_message('/camera/rgb/image_raw', Image, timeout=5)
                 h_img = image_data.height
                 w_img = image_data.width
                 cv_image = CvBridge().imgmsg_to_cv2(image_data, "bgr8")
-                np.save('cv_image.npy', cv_image)
+                # np.save('cv_image.npy', cv_image)
                 # print(h_img)
                 # print(w_img)
                 # print(cv_image[h_img/2, w_img/2])
@@ -141,23 +140,25 @@ class SimplemazeTurtlebotCameraCvNnEnv(gym.Env):
             cv2.drawContours(cv_image, contours, -1, (0, 255, 0), 3)
             area = cv2.contourArea(contours[0])
             distance = 1000/(math.sqrt(area) + 1)
-            # print("area=" + str(area))
+            # print("distance=" + str(distance))
         else:
             pass
 
         # cv2.imshow("image window", cv_image)
         # cv2.waitKey(3)
         done = False
-        distance = 10
+        # distance = 10
         if not bumped:
             if contours:
-                reward = 1
-                if 2.8 < distance < 3:
+                reward = 2*np.max([0.0, 10.0 - distance])
+                # print("r = " + str(reward))
+                if distance < 3:
+                    reward = 20.0
                     done = True
             else:
                 reward = 0
         else:
-            reward = -1
+            reward = -10
             done = True
         # print(bumped)
         '''

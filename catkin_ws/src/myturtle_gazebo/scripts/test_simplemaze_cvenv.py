@@ -18,19 +18,19 @@ def main():
 
     env = gym.wrappers.Monitor(env, outdir, force=True)
 
-    number_of_episodes = 10   # number of episodes in one experimental run
+    number_of_episodes = 400   # number of episodes in one experimental run
     max_steps_per_episode = 150   # maximum number of steps per episode
 
     alpha = 1e-3   # learning rate
     gamma = 0.99   # discount factor
     EXPLORE = 20000  # 100000
-    epsilon0 = 0.5  # 0.5
+    epsilon0 = 0.5
     epsilonf = 0.01
 
     output_size = 3
-    memory_size = 10000
-    learnStart = 3000   # The agent collects the data, but does not learn
-    updateTarget = 3000
+    memory_size = 1000
+    learnStart = 0   # The agent collects the data, but does not learn
+    updateTarget = 450
     deepQ = DeepQ(output_size, memory_size, gamma, alpha, learnStart, img_rows, img_cols, img_channels)
 
     for iter in xrange(1):  # 1 experimental run
@@ -55,7 +55,7 @@ def main():
             stp = 0
             qvalue = []
             epsilon = epsilon0 - (epsilon0 - epsilonf)/number_of_episodes*ep
-            epsilon = 0.00001
+            # epsilon = epsilon0
 
             for t in xrange(max_steps_per_episode):
                 q = deepQ.getQValues(o)
